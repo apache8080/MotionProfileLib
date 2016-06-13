@@ -45,7 +45,7 @@ public class TrajectoryGenerator{
         
         Segment[] trajectory = new Segment[totalIterations];
         double time=0.0;
-        for(int i=0; i<=totalIterations; i++){
+        for(int i=0; i<totalIterations; i++){
             double velocity, acceleration, position;
             if(time<=rampUpTime){
                 velocity = initialV+(this.maxA*time);
