@@ -45,7 +45,7 @@ public class TrajectoryGenerator{
         double totalTime = rampUpTime+coastTime+rampDownTime;
         int totalIterations = (int)(totalTime/(1/this.controlLoop));
         //double[] trajectoryInfo = {adjustedMaxV, rampUpTime, rampUpDistance, rampDownTime, rampDownDistance, coastDistance, coastTime, totalTime};
-
+        System.out.println(adjustedMaxV);
         Segment[] trajectory = new Segment[totalIterations];
         double time=0.0;
         for(int i=0; i<totalIterations; i++){
@@ -59,8 +59,8 @@ public class TrajectoryGenerator{
                 acceleration = 0;
                 position = velocity*time;
             }else{
-                velocity = adjustedMaxV-(this.maxA*time);
-                System.out.println(this.maxA*time);
+                velocity = adjustedMaxV-(this.maxA*(time-(rampUpTime+coastTime)));
+                //System.out.println(this.maxA*time);
                 acceleration = -this.maxA;
                 position = (coastDistance+rampUpDistance)+this.maxA*0.5*time*time;
             }
