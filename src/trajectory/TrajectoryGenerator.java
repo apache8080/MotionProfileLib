@@ -25,24 +25,27 @@ public class TrajectoryGenerator{
      * @return      the minimum between adjustedMaxV and maxV
      *
      */
-    private double calcAdjustedMaxV(double initialV, double totalDistance){ 
-        double adjustedMaxV = Math.sqrt((initialV*initialV)+(2*this.maxA*totalDistance));
+    private double calcAdjustedMaxV(double initialV, double endingV, double totalDistance){
+        double startDiscount = (0.5*initialV*initialV)/this.maxA;
+        double endDiscount = (0.5*endingV*endingV)/this.maxA;
+        double adjustedMaxV = Math.sqrt((this.maxA*totalDistance)-startDiscount-endDiscount);
 
         return Math.min(adjustedMaxV, this.maxV);
     }
 
 
     public Segment[] calcTrajectory(double initialV, double endingV, double totalDistance){
-        double adjustedMaxV = calcAdjustedMaxV(initialV, totalDistance);
+        double adjustedMaxV = calcAdjustedMaxV(initialV, endingV,  totalDistance);
         double rampUpTime = (adjustedMaxV - initialV)/this.maxA;
-        double rampUpDistance = adjustedMaxV*0.5*rampUpTime;
+        double rampUpDistance = initialV*rampUpTime + 0.5*this.maxA*rampUpTime*rampUpTime;
         double rampDownTime = (adjustedMaxV - endingV)/this.maxA;
-        double rampDownDistance = adjustedMaxV*0.5*rampDownTime;
+        double rampDownDistance = adjustedMaxV*rampDownTime-0.5*this.maxA*rampDownTime*rampDownTime;
         double coastDistance = totalDistance-(rampUpDistance+rampUpDistance);
         double coastTime = coastDistance/adjustedMaxV;
         double totalTime = rampUpTime+coastTime+rampDownTime;
         int totalIterations = (int)(totalTime/(1/this.controlLoop));
-        
+        //double[] trajectoryInfo = {adjustedMaxV, rampUpTime, rampUpDistance, rampDownTime, rampDownDistance, coastDistance, coastTime, totalTime};
+
         Segment[] trajectory = new Segment[totalIterations];
         double time=0.0;
         for(int i=0; i<totalIterations; i++){
@@ -57,8 +60,9 @@ public class TrajectoryGenerator{
                 position = velocity*time;
             }else{
                 velocity = adjustedMaxV-(this.maxA*time);
+                System.out.println(this.maxA*time);
                 acceleration = -this.maxA;
-                position = acceleration*0.5*time*time;
+                position = (coastDistance+rampUpDistance)+this.maxA*0.5*time*time;
             }
             time += (1/controlLoop);
             Segment s = new Segment(velocity, acceleration, position);
