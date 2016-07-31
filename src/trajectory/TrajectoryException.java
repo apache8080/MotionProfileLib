@@ -2,9 +2,9 @@ package trajectory;
 
 import java.io.*;
 
-public class TrajectoryException extends Exception{
+public class TrajectoryException extends Exception {
 
-    public TrajectoryException(String msg){
-        super(msg);
-    }
+  public TrajectoryException(String msg) {
+    super(msg);
+  }
 }
